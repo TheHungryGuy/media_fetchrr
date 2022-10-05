@@ -29,8 +29,8 @@ services:
     image: linuxserver/qbittorrent
     container_name: qbittorrent
     environment:
-      - PUID=1028
-      - PGID=100
+      - PUID=${PUID}
+      - PGID=${PGID}
       - TZ=${TZ}
       - WEBUI_PORT=8090
     volumes:
@@ -42,8 +42,8 @@ services:
   bazarr:
     container_name: bazarr
     environment:
-      - PUID=1028
-      - PGID=100
+      - PUID=${PUID}
+      - PGID=${PGID}
       - TZ=${TZ}
     image: cr.hotio.dev/hotio/bazarr:nightly
     ports:
@@ -79,7 +79,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
     network_mode: service:gluetun
     depends_on:
-      # - jackett
       - gluetun
   sonarr:
     container_name: sonarr
@@ -97,5 +96,4 @@ services:
       - /etc/localtime:/etc/localtime:ro
     network_mode: service:gluetun
     depends_on:
-      #- jackett
       - gluetun
