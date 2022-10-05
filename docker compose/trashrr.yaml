@@ -1,0 +1,101 @@
+version: "3.6"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: vpngluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8888:8888/tcp # HTTP proxy qbit?
+      - 8388:8388/tcp # Shadowsocks qbit
+      - 8388:8388/udp # Shadowsocks qbit
+      - 8080:8080 #qbittorrent port
+      - 8989:8989 # sonarr
+      - 9117:9117 # jackett
+      - 7878:7878 # radarr
+      #- 6767:6767 # bazarr 
+    volumes:
+      - /volume1/Media/docker/gluetun:/gluetun
+    environment:
+      - VPNSP=private internet access
+      - TZ=${TZ}
+      - USER=${USER} # Your username
+      - PASSWORD=${PASS} # Your password
+      - REGION=US East # Your region, e.g. US East. No quotes.
+      - EXTRA_SUBNETS=10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1028
+      - PGID=100
+      - TZ=${TZ}
+      - WEBUI_PORT=8090
+    volumes:
+      - /volume1/Media/docker/qbittorrent:/config
+      - /volume1/Media/torrents:/data/torrents
+    network_mode: service:gluetun # run on the vpn network
+    restart: unless-stopped
+
+  bazarr:
+    container_name: bazarr
+    environment:
+      - PUID=1028
+      - PGID=100
+      - TZ=${TZ}
+    image: cr.hotio.dev/hotio/bazarr:nightly
+    ports:
+      - 6767:6767/tcp
+    restart: unless-stopped
+    volumes:
+      - /volume1/Media/media:/data/media
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/appdata/bazarr:/config
+  jackett:
+    container_name: jackett
+    image: linuxserver/jackett:latest
+    network_mode: service:gluetun
+    #ports:
+     # - 9117:9117/tcp
+    depends_on:
+        - gluetun
+    volumes:
+      - /volume1/docker/jackett:/config
+  radarr:
+    container_name: radarr
+    image: cr.hotio.dev/hotio/sonarr:latest
+    restart: unless-stopped
+    logging:
+      driver: json-file    
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/appdata/sonarr:/config
+      - /volume1/Media:/data
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: service:gluetun
+    depends_on:
+      # - jackett
+      - gluetun
+  sonarr:
+    container_name: sonarr
+    image: cr.hotio.dev/hotio/sonarr:latest
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/appdata/sonarr:/config
+      - /volume1/Media:/data
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: service:gluetun
+    depends_on:
+      #- jackett
+      - gluetun

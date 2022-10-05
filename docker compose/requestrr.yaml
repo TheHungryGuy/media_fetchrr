@@ -1,0 +1,12 @@
+version: "3.6"
+services:
+  requestrr:
+    container_name: requestrr
+    hostname: requestrr
+    image: lscr.io/linuxserver/requestrr:latest
+    network_mode: bridge
+    ports:
+      - 4545:4545/tcp
+    restart: unless-stopped
+    volumes:
+      - /volume1/docker/requestrr:/config
