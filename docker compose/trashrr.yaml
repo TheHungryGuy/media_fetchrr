@@ -66,7 +66,7 @@ services:
       - /volume1/docker/jackett:/config
   radarr:
     container_name: radarr
-    image: cr.hotio.dev/hotio/sonarr:latest
+    image: cr.hotio.dev/hotio/radarr:latest
     restart: unless-stopped
     logging:
       driver: json-file    
@@ -75,9 +75,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /volume1/docker/appdata/sonarr:/config
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/appdata/radarr:/config
     network_mode: service:gluetun
     depends_on:
       - gluetun
