@@ -36,7 +36,7 @@ services:
       - WEBUI_PORT=8090
     volumes:
       - /volume1/Media/docker/qbittorrent:/config
-      - /volume1/Media/torrents:/data/torrents
+      - /volume1/Media/torrents:/data
     network_mode: service:gluetun # run on the vpn network
     restart: unless-stopped
 
