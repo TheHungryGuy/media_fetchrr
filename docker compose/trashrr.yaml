@@ -11,7 +11,7 @@ services:
       - 8888:8888/tcp # HTTP proxy qbit?
       - 8388:8388/tcp # Shadowsocks qbit
       - 8388:8388/udp # Shadowsocks qbit
-      - 8080:8080 #qbittorrent port
+      - 8090:8090 #qbittorrent port
       - 8989:8989 # sonarr
       - 9117:9117 # jackett
       - 7878:7878 # radarr
@@ -26,14 +26,14 @@ services:
       - REGION=US East # Your region, e.g. US East. No quotes.
       - EXTRA_SUBNETS=10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
   qbittorrent:
-    image: cr.hotio.dev/hotio/qbittorrent
+    image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - UMASK=002
       - TZ=${TZ}
-      #- WEBUI_PORT=8090
+      - WEBUI_PORT=8090
     volumes:
       - /volume1/Media/docker/qbittorrent:/config
       - /volume1/Media/torrents:/data/torrents
