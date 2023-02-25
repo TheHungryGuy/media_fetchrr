@@ -15,7 +15,7 @@ services:
       - 8989:8989 # sonarr
       - 9117:9117 # jackett
       - 7878:7878 # radarr
-      #- 6767:6767 # bazarr 
+      #- 6767:6767 # bazarr
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
@@ -38,6 +38,9 @@ services:
       - /volume1/Media/docker/qbittorrent:/config
       - /volume1/Media/torrents:/data
     network_mode: service:gluetun # run on the vpn network
+    depends_on:
+      gluetun:
+        condition: service_healthy
     restart: unless-stopped
 
   bazarr:
@@ -59,9 +62,10 @@ services:
     image: linuxserver/jackett:latest
     network_mode: service:gluetun
     #ports:
-     # - 9117:9117/tcp
+    # - 9117:9117/tcp
     depends_on:
-        - gluetun
+      gluetun:
+        condition: service_healthy
     volumes:
       - /volume1/docker/jackett:/config
   radarr:
@@ -69,7 +73,7 @@ services:
     image: cr.hotio.dev/hotio/radarr:latest
     restart: unless-stopped
     logging:
-      driver: json-file    
+      driver: json-file
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -80,7 +84,8 @@ services:
       - /volume1/docker/appdata/radarr:/config
     network_mode: service:gluetun
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
   sonarr:
     container_name: sonarr
     image: cr.hotio.dev/hotio/sonarr:latest
@@ -97,4 +102,5 @@ services:
       - /etc/localtime:/etc/localtime:ro
     network_mode: service:gluetun
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
