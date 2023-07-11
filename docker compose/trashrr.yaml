@@ -19,7 +19,7 @@ services:
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
-      - VPNSP=private internet access
+      - VPNSP=${PROVIDER} # 'private internet access'
       - TZ=${TZ}
       - USER=${USER} # Your username
       - PASSWORD=${PASS} # Your password
