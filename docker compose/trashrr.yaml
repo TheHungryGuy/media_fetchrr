@@ -23,9 +23,9 @@ services:
       - TZ=${TZ}
       - USER=${USER} # Your username
       - PASSWORD=${PASS} # Your password
-      - REGION=US East # Your region, e.g. US East. No quotes.
+      - REGION=US West # Your region, e.g. US East. No quotes.
       - EXTRA_SUBNETS=10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
-    command: update -enduser -providers 'private internet access'
+    command: update -enduser -providers private internet access
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
