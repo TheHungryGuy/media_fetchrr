@@ -1,7 +1,7 @@
 version: "3.6"
 services:
   gluetun:
-    image: qmcgaw/gluetun:latest
+    image: qmcgaw/gluetun:
     container_name: vpngluetun
     cap_add:
       - NET_ADMIN
@@ -25,6 +25,7 @@ services:
       - PASSWORD=${PASS} # Your password
       - REGION=US East # Your region, e.g. US East. No quotes.
       - EXTRA_SUBNETS=10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
+    command: update -enduser -providers ${PROVIDER}
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
