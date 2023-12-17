@@ -41,7 +41,7 @@ services:
       - DELUGE_LOGLEVEL=error #optional
     volumes:
       - /volume1/Media/docker/deluge2/config:/config
-      - /volume1/Media/torrents:/downloads
+      - /volume1/Media/torrents:/data
     network_mode: service:gluetun # run on the vpn network
     depends_on:
       gluetun:
