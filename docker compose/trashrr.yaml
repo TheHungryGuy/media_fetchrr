@@ -42,6 +42,7 @@ services:
     volumes:
       - /volume1/Media/docker/deluge2/config:/config
       - /volume1/Media/torrents:/downloads
+    network_mode: service:gluetun # run on the vpn network
     depends_on:
       gluetun:
         condition: service_healthy
