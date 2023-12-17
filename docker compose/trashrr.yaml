@@ -16,6 +16,11 @@ services:
       - 9117:9117 # jackett
       - 7878:7878 # radarr
       #- 6767:6767 # bazarr
+        
+      - 8112:8112 # deluge
+      - 6881:6881 # deluge
+      - 6881:6881/udp # deluge
+      - 58846:58846 #optional # deluge
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
@@ -25,7 +30,20 @@ services:
       - PASSWORD=${PASS} # Your password
       - REGION=US West # Your region, e.g. US East. No quotes.
       - EXTRA_SUBNETS=10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
-    
+#===========================================================
+  deluge:
+    image: lscr.io/linuxserver/deluge:latest
+    container_name: deluge
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DELUGE_LOGLEVEL=error #optional
+    volumes:
+      - /volume1/Media/docker/deluge2/config:/config
+      - /volume1/Media/torrents:/downloads
+    restart: unless-stopped
+#===========================================================    
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
