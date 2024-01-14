@@ -161,8 +161,7 @@ services:
     volumes:
       - /volume1/Media/media/manga:/Manga
       - /volume1/docker/tranga/config:/usr/share/tranga-api
-    restart: unless-stopped
-        network_mode: service:gluetun
+    network_mode: service:gluetun
     depends_on:
       gluetun:
         condition: service_healthy
