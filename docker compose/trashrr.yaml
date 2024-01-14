@@ -141,7 +141,7 @@ services:
     container_name: komga
     image: gotson/komga
     ports:
-      - "8341:25600"
+      - "25600:25600"
     environment:
       - TZ=${TZ}
     volumes:
