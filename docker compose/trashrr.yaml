@@ -68,20 +68,20 @@ services:
     restart: unless-stopped
 
 #===========================================================#
-  # bazarr:
-  #   container_name: bazarr
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #   image: cr.hotio.dev/hotio/bazarr:nightly
-  #   ports:
-  #     - 6767:6767/tcp
-  #   restart: unless-stopped
-  #   volumes:
-  #     - /volume1/Media/media:/data/media
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - /volume1/docker/appdata/bazarr:/config
+  bazarr:
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    image: ghcr.io/hotio/bazarr:nightly
+    ports:
+      - 6767:6767/tcp
+    restart: unless-stopped
+    volumes:
+      - /volume1/Media/media:/data/media
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/appdata/bazarr:/config
       
 #===========================================================#
   jackett:
@@ -99,7 +99,7 @@ services:
 #===========================================================#
   radarr:
     container_name: radarr
-    image: cr.hotio.dev/hotio/radarr:latest
+    image: ghcr.io/hotio/radarr:latest
     restart: unless-stopped
     logging:
       driver: json-file
@@ -119,7 +119,7 @@ services:
 #===========================================================#
   sonarr:
     container_name: sonarr
-    image: cr.hotio.dev/hotio/sonarr:latest
+    image: ghcr.io/hotio/sonarr:latest
     restart: unless-stopped
     logging:
       driver: json-file
@@ -138,8 +138,8 @@ services:
 
 #===========================================================#
   komga:
-    image: gotson/komga
     container_name: komga
+    image: gotson/komga
     ports:
       - "8341:25600"
     environment:
