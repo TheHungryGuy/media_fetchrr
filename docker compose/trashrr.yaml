@@ -160,7 +160,7 @@ services:
     container_name: tranga-api
     volumes:
       - /volume1/Media/media/manga:/Manga
-      -  /volume1/docker/tranga/config:/usr/share/tranga-api
+      - /volume1/docker/tranga/config:/usr/share/tranga-api
     restart: unless-stopped
         network_mode: service:gluetun
     depends_on:
@@ -172,7 +172,7 @@ services:
     image: glax/tranga-website:latest
     container_name: tranga-website
     ports:
-      - "9555:80"
+      - 9555:80
     depends_on: 
       - tranga-api
     restart: unless-stopped
