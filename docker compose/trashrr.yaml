@@ -137,3 +137,19 @@ services:
         condition: service_healthy
 
 #===========================================================#
+  komga:
+    image: gotson/komga
+    container_name: komga
+    ports:
+      - "8341:25600"
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/komga/config:/config
+      - /volume1/Media/media/manga:/data
+    user: "${PUID}:${PGID}"
+    network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    restart: always
