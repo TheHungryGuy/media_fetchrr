@@ -21,6 +21,7 @@ services:
       - 6881:6881 # deluge
       - 6881:6881/udp # deluge
       - 58846:58846 #optional # deluge
+      - 25600:25600 #  komga
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
@@ -152,4 +153,4 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
