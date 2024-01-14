@@ -1,4 +1,9 @@
 version: "3.6"
+
+volumes:
+  db:
+  redis:
+
 services:
 #===========================================================#
   gluetun:
@@ -22,7 +27,7 @@ services:
       - 6881:6881/udp # deluge
       - 58846:58846 #optional # deluge
       - 8341:25600 # komga
-      - 6531:6531 #tranga
+      - 3000:3000 #kaizoku
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
@@ -155,23 +160,44 @@ services:
     restart: unless-stopped
 
 #==========================================================#
-  tranga-api:
-    image: glax/tranga-api:latest
-    container_name: tranga-api
+  kaizoku:
+    container_name: kaizoku
+    image: ghcr.io/oae/kaizoku:latest
+    environment:
+      - DATABASE_URL=postgresql://kaizoku:kaizoku@db:5432/kaizoku
+      - KAIZOKU_PORT=3000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /volume1/Media/media/manga:/Manga
-      - /volume1/docker/tranga/config:/usr/share/tranga-api
+      - /volume1/docker/kaizoku/config:/config
+      - /volume1/docker/kaizoku/logs:/logs
+      - /volume1/Media/media/manga:/data
+    depends_on:
+      db:
+        condition: service_healthy
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis:/data
+  db:
+    image: postgres:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kaizoku']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=kaizoku
+      - POSTGRES_DB=kaizoku
+      - POSTGRES_PASSWORD=kaizoku
+    volumes:
+      - db:/var/lib/postgresql/data
     network_mode: service:gluetun
     depends_on:
       gluetun:
         condition: service_healthy
-    restart: unless-stopped
-    
-  tranga-website:
-    image: glax/tranga-website:latest
-    container_name: tranga-website
-    ports:
-      - 9555:80
-    depends_on: 
-      - tranga-api
     restart: unless-stopped
