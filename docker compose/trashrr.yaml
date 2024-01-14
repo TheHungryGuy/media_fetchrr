@@ -21,7 +21,8 @@ services:
       - 6881:6881 # deluge
       - 6881:6881/udp # deluge
       - 58846:58846 #optional # deluge
-      - 8341:25600 #  komga
+      - 8341:25600 # komga
+      - 9080:8080  # hakuneko
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
@@ -147,6 +148,27 @@ services:
       - /volume1/docker/komga/config:/config
       - /volume1/Media/media/manga:/data
     user: "${PUID}:${PGID}"
+    network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    restart: unless-stopped
+
+#==========================================================#
+  #hakuneko
+  calibre:
+    image: shlagevuk/hakuneko
+    container_name: hakuneko
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - GUAC_USER=abc #optional
+      - GUAC_PASS=900150983cd24fb0d6963f7d28e17f72 #optional
+      - cap-add=CAP_SYS_ADMIN 
+      - APPNAME="hakuneko-desktop" 
+    volumes:
+      - /volume1/docker/hakuneko/config:/config
     network_mode: service:gluetun
     depends_on:
       gluetun:
