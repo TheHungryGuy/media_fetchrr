@@ -160,15 +160,16 @@ services:
     image: shlagevuk/hakuneko
     container_name: hakuneko
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - GUAC_USER=abc #optional
       - GUAC_PASS=900150983cd24fb0d6963f7d28e17f72 #optional
       - cap-add=CAP_SYS_ADMIN 
       - APPNAME="hakuneko-desktop" 
     volumes:
       - /volume1/docker/hakuneko/config:/config
+      - /volume1/Media/media/manga:/data
     network_mode: service:gluetun
     depends_on:
       gluetun:
