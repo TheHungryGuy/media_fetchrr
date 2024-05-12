@@ -8,6 +8,7 @@ services:
 #===========================================================#
   gluetun:
     image: qmcgaw/gluetun
+    restart: unless-stopped
     container_name: vpngluetun
     cap_add:
       - NET_ADMIN
