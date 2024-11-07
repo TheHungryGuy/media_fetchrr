@@ -143,42 +143,24 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-
 #===========================================================#
-  komga:
-    container_name: komga
-    image: gotson/komga
-    environment:
-      - TZ=${TZ}
+services:
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    ports:
+      - 13378:80
     volumes:
-      - /volume1/docker/komga/config:/config
-      - /volume1/Media/media/manga:/data
-    user: "${PUID}:${PGID}"
-    network_mode: service:gluetun
-    depends_on:
-      gluetun:
-        condition: service_healthy
+      - ./audiobooks:/audiobooks
+      - ./podcasts:/podcasts
+      - ./metadata:/metadata
+      - ./config:/config
     restart: unless-stopped
+    # You can use the following user directive to run the ABS
+    # docker container as a specific user. You will need to change
+    # the UID and GID to the correct values for your user.
+    # user: 1000:1000
+  #===========================================================#
 
-#==========================================================#
-  kaizoku:
-    container_name: kaizoku
-    image: ghcr.io/oae/kaizoku:latest
-    environment:
-      - DATABASE_URL=postgresql://kaizoku:kaizoku@db:5432/kaizoku
-      - KAIZOKU_PORT=3000
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - /volume1/docker/kaizoku/config:/config
-      - /volume1/docker/kaizoku/logs:/logs
-      - /volume1/Media/media/manga:/data
-    depends_on:
-      db:
-        condition: service_healthy
   redis:
     image: redis:7-alpine
     volumes:
