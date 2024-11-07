@@ -153,11 +153,11 @@ services:
       - ./podcasts:/podcasts
       - ./metadata:/metadata
       - ./config:/config
-    network_mode: service:gluetun
-    depends_on:
-      gluetun:
-        condition: service_healthy
-    restart: unless-stopped
+    # network_mode: service:gluetun
+    # depends_on:
+    #   gluetun:
+    #     condition: service_healthy
+    # restart: unless-stopped
     # You can use the following user directive to run the ABS
     # docker container as a specific user. You will need to change
     # the UID and GID to the correct values for your user.
