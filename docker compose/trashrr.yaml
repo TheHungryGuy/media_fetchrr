@@ -144,7 +144,6 @@ services:
       gluetun:
         condition: service_healthy
 #===========================================================#
-services:
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     ports:
