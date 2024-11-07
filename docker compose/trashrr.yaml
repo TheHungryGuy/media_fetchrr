@@ -29,7 +29,6 @@ services:
       - 58846:58846 #optional # deluge
       - 8341:25600 # komga
       - 3000:3000 #kaizoku
-      - 13378:80 #audiobookshelf
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
