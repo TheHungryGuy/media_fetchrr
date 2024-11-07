@@ -145,13 +145,13 @@ services:
       gluetun:
         condition: service_healthy
 #===========================================================#
-  audiobookshelf:
-    image: ghcr.io/advplyr/audiobookshelf:latest
-    volumes:
-      - ./audiobooks:/audiobooks
-      - ./podcasts:/podcasts
-      - ./metadata:/metadata
-      - ./config:/config
+  # audiobookshelf:
+  #   image: ghcr.io/advplyr/audiobookshelf:latest
+  #   volumes:
+  #     - ./audiobooks:/audiobooks
+  #     - ./podcasts:/podcasts
+  #     - ./metadata:/metadata
+  #     - ./config:/config
     # network_mode: service:gluetun
     # depends_on:
     #   gluetun:
