@@ -145,60 +145,60 @@ services:
         condition: service_healthy
 
 #===========================================================#
-  komga:
-    container_name: komga
-    image: gotson/komga
-    environment:
-      - TZ=${TZ}
-    volumes:
-      - /volume1/docker/komga/config:/config
-      - /volume1/Media/media/manga:/data
-    user: "${PUID}:${PGID}"
-    network_mode: service:gluetun
-    depends_on:
-      gluetun:
-        condition: service_healthy
-    restart: unless-stopped
+  # komga:
+  #   container_name: komga
+  #   image: gotson/komga
+  #   environment:
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - /volume1/docker/komga/config:/config
+  #     - /volume1/Media/media/manga:/data
+  #   user: "${PUID}:${PGID}"
+  #   network_mode: service:gluetun
+  #   depends_on:
+  #     gluetun:
+  #       condition: service_healthy
+  #   restart: unless-stopped
 
 #==========================================================#
-  kaizoku:
-    container_name: kaizoku
-    image: ghcr.io/oae/kaizoku:latest
-    environment:
-      - DATABASE_URL=postgresql://kaizoku:kaizoku@db:5432/kaizoku
-      - KAIZOKU_PORT=3000
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - /volume1/docker/kaizoku/config:/config
-      - /volume1/docker/kaizoku/logs:/logs
-      - /volume1/Media/media/manga:/data
-    depends_on:
-      db:
-        condition: service_healthy
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis:/data
-  db:
-    image: postgres:alpine
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U kaizoku']
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    environment:
-      - POSTGRES_USER=kaizoku
-      - POSTGRES_DB=kaizoku
-      - POSTGRES_PASSWORD=kaizoku
-    volumes:
-      - db:/var/lib/postgresql/data
-    network_mode: service:gluetun
-    depends_on:
-      gluetun:
-        condition: service_healthy
-    restart: unless-stopped
+  # kaizoku:
+  #   container_name: kaizoku
+  #   image: ghcr.io/oae/kaizoku:latest
+  #   environment:
+  #     - DATABASE_URL=postgresql://kaizoku:kaizoku@db:5432/kaizoku
+  #     - KAIZOKU_PORT=3000
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - /volume1/docker/kaizoku/config:/config
+  #     - /volume1/docker/kaizoku/logs:/logs
+  #     - /volume1/Media/media/manga:/data
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  # redis:
+  #   image: redis:7-alpine
+  #   volumes:
+  #     - redis:/data
+  # db:
+    # image: postgres:alpine
+    # restart: unless-stopped
+    # healthcheck:
+    #   test: ['CMD-SHELL', 'pg_isready -U kaizoku']
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 5
+    # environment:
+    #   - POSTGRES_USER=kaizoku
+    #   - POSTGRES_DB=kaizoku
+    #   - POSTGRES_PASSWORD=kaizoku
+    # volumes:
+    #   - db:/var/lib/postgresql/data
+    # network_mode: service:gluetun
+    # depends_on:
+    #   gluetun:
+    #     condition: service_healthy
+    # restart: unless-stopped
