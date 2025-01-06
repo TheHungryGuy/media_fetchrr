@@ -21,7 +21,8 @@ services:
       - 8090:8090 #qbittorrent port
       - 8989:8989 # sonarr
       - 9117:9117 # jackett
-      - 9696:9696 # jackett
+      - 9696:9696 # prowlarr
+      - 8191:8191 # flaresolverr
       - 7878:7878 # radarr
       #- 6767:6767 # bazarr
       - 8112:8112 # deluge
@@ -103,6 +104,19 @@ services:
         condition: service_healthy
     volumes:
       - /volume1/docker/jackett:/config
+#===========================================================#
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - MAX_TIMEOUT=60000
+      - CAPTCHA_SOLVER=none # Change to your solver if needed
+    depends_on:
+    gluetun:
+      condition: service_healthy
 #===========================================================#
   prowlarr:
     container_name: prowlarrr
