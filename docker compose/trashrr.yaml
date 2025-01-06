@@ -115,8 +115,8 @@ services:
       - MAX_TIMEOUT=60000
       - CAPTCHA_SOLVER=none # Change to your solver if needed
     depends_on:
-    gluetun:
-      condition: service_healthy
+      gluetun:
+        condition: service_healthy
 #===========================================================#
   prowlarr:
     container_name: prowlarrr
