@@ -21,6 +21,7 @@ services:
       - 8090:8090 #qbittorrent port
       - 8989:8989 # sonarr
       - 9117:9117 # jackett
+      - 9696:9696 # jackett
       - 7878:7878 # radarr
       #- 6767:6767 # bazarr
       - 8112:8112 # deluge
@@ -89,10 +90,9 @@ services:
     volumes:
       - /volume1/Media/media:/data/media
       - /etc/localtime:/etc/localtime:ro
-      - /volume1/docker/appdata/bazarr:/config
-      
+      - /volume1/docker/appdata/bazarr:/config      
 #===========================================================#
-  jackett:
+  jackett: # Fucking Jacket is Fucking Slow
     container_name: jackett
     image: linuxserver/jackett:latest
     network_mode: service:gluetun
@@ -103,7 +103,22 @@ services:
         condition: service_healthy
     volumes:
       - /volume1/docker/jackett:/config
-      
+#===========================================================#
+  prowlarr:
+    container_name: prowlarr
+    image: lscr.io/linuxserver/prowlarr:develop
+    restart: unless-stopped
+    network_mode: service:gluetun # Use the VPN network
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/appdata/prowlarr:/config
+      - /volume1/Media:/data      
 #===========================================================#
   radarr:
     container_name: radarr
