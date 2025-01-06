@@ -105,7 +105,7 @@ services:
       - /volume1/docker/jackett:/config
 #===========================================================#
   prowlarr:
-    container_name: prowlarr
+    container_name: prowlarrr
     image: lscr.io/linuxserver/prowlarr:develop
     restart: unless-stopped
     network_mode: service:gluetun # Use the VPN network
