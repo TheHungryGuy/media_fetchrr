@@ -44,7 +44,6 @@ services:
   deluge:
     image: lscr.io/linuxserver/deluge:latest
     container_name: deluge
-    command: ["/bin/sh", "-c", "/config/start_deluge.sh"]
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
