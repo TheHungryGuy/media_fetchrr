@@ -40,8 +40,8 @@ services:
       ### Wireguard Settings
       - VPN_TYPE=wireguard
       - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
-      # - SERVER_COUNTRIES=Netherlands
-      - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
+      - SERVER_COUNTRIES=US East
+      # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
 #===========================================================#
   deluge:
     image: lscr.io/linuxserver/deluge:latest
