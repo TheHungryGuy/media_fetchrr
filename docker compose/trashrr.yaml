@@ -40,7 +40,7 @@ services:
       ### Wireguard Settings
       - VPN_TYPE=wireguard
       - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
-      - SERVER_COUNTRIES=US East
+      - SERVER_COUNTRIES=$country
       # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
 #===========================================================#
   deluge:
