@@ -7,9 +7,9 @@ volumes:
 services:
 #===========================================================#
   gluetun:
-    image: qmcgaw/gluetun
-    restart: unless-stopped
-    container_name: vpngluetun
+    image: qmcgaw/gluetun:v3.39.0 # Pinned to this version to avoid issues in v3.40+ specific to protonvpnimage: qmcgaw/gluetun:v3.39.0 # Pinned to this version to avoid issues in v3.40+ specific to protonvpn
+    restart: always
+    container_name: gluetun
     cap_add:
       - NET_ADMIN
     devices:
@@ -29,17 +29,20 @@ services:
       - 6881:6881 # deluge
       - 6881:6881/udp # deluge
       - 58846:58846 #optional # deluge
-      - 8341:25600 # komga
-      - 3000:3000 #kaizoku
+      # - 8341:25600 # komga
+      # - 3000:3000 #kaizoku
     volumes:
       - /volume1/Media/docker/gluetun:/gluetun
     environment:
-      - VPNSP=private internet access
+      - VPN_SERVICE_PROVIDER=protonvpn
       - TZ=${TZ}
-      - USER=${USER} # Your username
-      - PASSWORD=${PASS} # Your password
-      - REGION=US East # Your region, e.g. US East. No quotes.
-      - EXTRA_SUBNETS=10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
+      - VPN_PORT_FORWARDING=off
+      ### Wireguard Settings
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
+      - SERVER_COUNTRIES=Netherlands
+	    - SERVER_HOSTNAMES=ch-us-01a.protonvpn.com
+	  
 #===========================================================#
   deluge:
     image: lscr.io/linuxserver/deluge:latest
