@@ -42,7 +42,6 @@ services:
       - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
       - SERVER_COUNTRIES=Netherlands
       - SERVER_HOSTNAMES=ch-us-01a.protonvpn.com
-	  
 #===========================================================#
   deluge:
     image: lscr.io/linuxserver/deluge:latest
