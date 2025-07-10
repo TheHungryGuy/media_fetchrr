@@ -5,9 +5,7 @@ volumes:
 services:
 #===========================================================#
   gluetun:
-    image: qmcgaw/gluetun:v3.39.0 # Pinned to this version to avoid issues in v3.40+ specific to protonvpnimage: qmcgaw/gluetun:v3.39.0 # Pinned to this version to avoid issues in v3.40+ specific to protonvpn
-    restart: always
-    container_name: gluetun
+    image: qmcgaw/gluetun:latest
     cap_add:
       - NET_ADMIN
     devices:
@@ -38,7 +36,7 @@ services:
       - TZ=${TZ}
       - VPN_PORT_FORWARDING=on
       - PORT_FORWARD_ONLY=on
-      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'until wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8090/api/v2/app/setPreferences 2>&1; do echo "Waiting for qBittorrent API..."; sleep 5; done'
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'echo Updating qBittorrent port to {{PORTS}} && wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8090/api/v2/app/setPreferences 2>&1'
       ### Wireguard Settings
       - VPN_TYPE=wireguard
       - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
