@@ -77,8 +77,7 @@ services:
       - /volume1/Media:/data
     network_mode: service:gluetun # run on the vpn network
     depends_on:
-      gluetun:
-        condition: service_healthy
+      - gluetun
     restart: unless-stopped
 
 #===========================================================#
