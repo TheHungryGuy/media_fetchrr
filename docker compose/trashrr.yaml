@@ -71,13 +71,13 @@ services:
       - UMASK=002
       - TZ=${TZ}
       - WEBUI_PORT=8090
-      - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
+      # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
     volumes:
       - /volume1/Media/docker/qbittorrent:/config
       - /volume1/Media:/data
     network_mode: service:gluetun # run on the vpn network
-    depends_on:
-      - gluetun
+    # depends_on:
+    #   - gluetun
     restart: unless-stopped
 
 #===========================================================#
