@@ -1,11 +1,13 @@
+networks:
+  fetchrr_net:
+    external: true
+
 services:
   #===========================================================#
   gluetun:
+    container_name: gluetun
     image: qmcgaw/gluetun:latest
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
+    restart: unless-stopped
     ports:
       - 8888:8888/tcp # HTTP proxy qbit?
       - 8388:8388/tcp # Shadowsocks qbit
@@ -15,9 +17,6 @@ services:
       - 9696:9696 # prowlarr
       - 7878:7878 # radarr
       - 9117:9117 # jackett
-
-    volumes:
-      - /volume1/Media/docker/gluetun:/gluetun
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -31,11 +30,20 @@ services:
       - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
       - SERVER_COUNTRIES=$country
       # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
+    volumes:
+      - /volume1/Media/docker/gluetun:/gluetun
+    networks:
+      - fetchrr_net
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
 
   #===========================================================
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent
+    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -46,33 +54,31 @@ services:
     volumes:
       - /volume1/Media/docker/qbittorrent:/config
       - /volume1/Media:/data
-    network_mode: service:gluetun # Use the VPN network
     # depends_on:
     #   - gluetun
-    restart: unless-stopped
-
+    network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
   #===========================================================#
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
-    network_mode: service:gluetun # Use the VPN network
+    # restart: unless-stopped
     # ports:
     # - 9117:9117/tcp
+    volumes:
+      - /volume1/docker/jackett:/config
     depends_on:
       gluetun:
         condition: service_healthy
-    volumes:
-      - /volume1/docker/jackett:/config
-
+    network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
   #===========================================================#
   prowlarr:
     container_name: prowlarrr
     image: lscr.io/linuxserver/prowlarr:develop
     restart: unless-stopped
-    network_mode: service:gluetun # Use the VPN network
-    depends_on:
-      gluetun:
-        condition: service_healthy
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -80,13 +86,17 @@ services:
     volumes:
       - /volume1/docker/appdata/prowlarr:/config
       - /volume1/Media:/data
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
   #===========================================================#
   radarr:
     container_name: radarr
     image: ghcr.io/hotio/radarr:latest
     restart: unless-stopped
-    logging:
-      driver: json-file
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -95,18 +105,19 @@ services:
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
       - /volume1/docker/appdata/radarr:/config
-    network_mode: service:gluetun # Use the VPN network
     depends_on:
       gluetun:
         condition: service_healthy
-
+    network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
+    logging:
+      driver: json-file
   #===========================================================#
   sonarr:
     container_name: sonarr
     image: ghcr.io/hotio/sonarr:latest
     restart: unless-stopped
-    logging:
-      driver: json-file
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -115,23 +126,29 @@ services:
       - /volume1/docker/appdata/sonarr:/config
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
-    network_mode: service:gluetun # Use the VPN network
     depends_on:
       gluetun:
         condition: service_healthy
+    network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
+    logging:
+      driver: json-file
   #===========================================================#
   bazarr:
     container_name: bazarr
+    image: ghcr.io/hotio/bazarr:nightly
+    restart: unless-stopped
+    ports:
+      - 6767:6767/tcp
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-    image: ghcr.io/hotio/bazarr:nightly
-    ports:
-      - 6767:6767/tcp
-    restart: unless-stopped
     volumes:
       - /volume1/Media/media:/data/media
       - /etc/localtime:/etc/localtime:ro
       - /volume1/docker/appdata/bazarr:/config
+    networks:
+      - fetchrr_net
   #===========================================================#
