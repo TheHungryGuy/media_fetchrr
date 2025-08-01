@@ -3,7 +3,7 @@ volumes:
   redis:
 
 services:
-#===========================================================#
+  #===========================================================#
   gluetun:
     image: qmcgaw/gluetun:latest
     cap_add:
@@ -42,7 +42,7 @@ services:
       - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
       - SERVER_COUNTRIES=$country
       # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
-#===========================================================#
+  #===========================================================#
   deluge:
     image: lscr.io/linuxserver/deluge:latest
     container_name: deluge
@@ -59,7 +59,7 @@ services:
       gluetun:
         condition: service_healthy
     restart: unless-stopped
-#===========================================================    
+  #===========================================================
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
@@ -78,7 +78,7 @@ services:
     #   - gluetun
     restart: unless-stopped
 
-#===========================================================#
+  #===========================================================#
   bazarr:
     container_name: bazarr
     environment:
@@ -92,8 +92,8 @@ services:
     volumes:
       - /volume1/Media/media:/data/media
       - /etc/localtime:/etc/localtime:ro
-      - /volume1/docker/appdata/bazarr:/config      
-#===========================================================#
+      - /volume1/docker/appdata/bazarr:/config
+  #===========================================================#
   jackett: # Fucking Jacket is Fucking Slow
     container_name: jackett
     image: linuxserver/jackett:latest
@@ -105,7 +105,7 @@ services:
         condition: service_healthy
     volumes:
       - /volume1/docker/jackett:/config
-#===========================================================#
+  #===========================================================#
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
@@ -118,7 +118,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-#===========================================================#
+  #===========================================================#
   prowlarr:
     container_name: prowlarrr
     image: lscr.io/linuxserver/prowlarr:develop
@@ -133,8 +133,8 @@ services:
       - TZ=${TZ}
     volumes:
       - /volume1/docker/appdata/prowlarr:/config
-      - /volume1/Media:/data      
-#===========================================================#
+      - /volume1/Media:/data
+  #===========================================================#
   radarr:
     container_name: radarr
     image: ghcr.io/hotio/radarr:latest
@@ -153,8 +153,8 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-        
-#===========================================================#
+
+  #===========================================================#
   sonarr:
     container_name: sonarr
     image: ghcr.io/hotio/sonarr:latest
@@ -173,62 +173,61 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-
 #===========================================================#
-  # komga:
-  #   container_name: komga
-  #   image: gotson/komga
-  #   environment:
-  #     - TZ=${TZ}
-  #   volumes:
-  #     - /volume1/docker/komga/config:/config
-  #     - /volume1/Media/media/manga:/data
-  #   user: "${PUID}:${PGID}"
-  #   network_mode: service:gluetun
-  #   depends_on:
-  #     gluetun:
-  #       condition: service_healthy
-  #   restart: unless-stopped
+# komga:
+#   container_name: komga
+#   image: gotson/komga
+#   environment:
+#     - TZ=${TZ}
+#   volumes:
+#     - /volume1/docker/komga/config:/config
+#     - /volume1/Media/media/manga:/data
+#   user: "${PUID}:${PGID}"
+#   network_mode: service:gluetun
+#   depends_on:
+#     gluetun:
+#       condition: service_healthy
+#   restart: unless-stopped
 
 #==========================================================#
-  # kaizoku:
-  #   container_name: kaizoku
-  #   image: ghcr.io/oae/kaizoku:latest
-  #   environment:
-  #     - DATABASE_URL=postgresql://kaizoku:kaizoku@db:5432/kaizoku
-  #     - KAIZOKU_PORT=3000
-  #     - REDIS_HOST=redis
-  #     - REDIS_PORT=6379
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #   volumes:
-  #     - /volume1/docker/kaizoku/config:/config
-  #     - /volume1/docker/kaizoku/logs:/logs
-  #     - /volume1/Media/media/manga:/data
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  # redis:
-  #   image: redis:7-alpine
-  #   volumes:
-  #     - redis:/data
-  # db:
-    # image: postgres:alpine
-    # restart: unless-stopped
-    # healthcheck:
-    #   test: ['CMD-SHELL', 'pg_isready -U kaizoku']
-    #   interval: 5s
-    #   timeout: 5s
-    #   retries: 5
-    # environment:
-    #   - POSTGRES_USER=kaizoku
-    #   - POSTGRES_DB=kaizoku
-    #   - POSTGRES_PASSWORD=kaizoku
-    # volumes:
-    #   - db:/var/lib/postgresql/data
-    # network_mode: service:gluetun
-    # depends_on:
-    #   gluetun:
-    #     condition: service_healthy
-    # restart: unless-stopped
+# kaizoku:
+#   container_name: kaizoku
+#   image: ghcr.io/oae/kaizoku:latest
+#   environment:
+#     - DATABASE_URL=postgresql://kaizoku:kaizoku@db:5432/kaizoku
+#     - KAIZOKU_PORT=3000
+#     - REDIS_HOST=redis
+#     - REDIS_PORT=6379
+#     - PUID=${PUID}
+#     - PGID=${PGID}
+#     - TZ=${TZ}
+#   volumes:
+#     - /volume1/docker/kaizoku/config:/config
+#     - /volume1/docker/kaizoku/logs:/logs
+#     - /volume1/Media/media/manga:/data
+#   depends_on:
+#     db:
+#       condition: service_healthy
+# redis:
+#   image: redis:7-alpine
+#   volumes:
+#     - redis:/data
+# db:
+# image: postgres:alpine
+# restart: unless-stopped
+# healthcheck:
+#   test: ['CMD-SHELL', 'pg_isready -U kaizoku']
+#   interval: 5s
+#   timeout: 5s
+#   retries: 5
+# environment:
+#   - POSTGRES_USER=kaizoku
+#   - POSTGRES_DB=kaizoku
+#   - POSTGRES_PASSWORD=kaizoku
+# volumes:
+#   - db:/var/lib/postgresql/data
+# network_mode: service:gluetun
+# depends_on:
+#   gluetun:
+#     condition: service_healthy
+# restart: unless-stopped
