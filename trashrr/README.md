@@ -77,3 +77,30 @@ Ensure it exists before running:
 ```bash
 docker network create fetchrr_net
 ```
+
+---
+
+## 🌐 Additional Services
+
+### ☁️ Cloudflared
+
+- Securely tunnels local services to the internet using Cloudflare
+- Uses $TUNNEL_TOKEN
+- Joins the same external network: fetchrr_net
+
+### 🎥 Plex
+
+- Media server for local/remote streaming
+- Uses host networking (bypasses Gluetun)
+- Optional mod: plex-absolute-hama for better metadata parsing
+- VAAPI hardware acceleration enabled via /dev/dri
+
+### 📺 Jellyfin
+
+- Open-source alternative to Plex, supports DLNA and hardware transcoding
+- Hardware acceleration via VAAPI
+
+### 💬 Requestrr
+
+- Media request bot for Discord
+- Handles requests via chat
