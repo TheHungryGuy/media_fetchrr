@@ -31,7 +31,7 @@ services:
       - SERVER_COUNTRIES=$country
       # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
     volumes:
-      - /volume1/Media/docker/gluetun:/gluetun
+      - /volume1/docker/gluetun:/gluetun
     networks:
       - fetchrr_net
     cap_add:
@@ -52,7 +52,7 @@ services:
       - WEBUI_PORT=8090
       # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
     volumes:
-      - /volume1/Media/docker/qbittorrent:/config
+      - /volume1/docker/qbittorrent/config:/config
       - /volume1/Media:/data
     # depends_on:
     #   - gluetun
@@ -63,11 +63,11 @@ services:
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
-    # restart: unless-stopped
+    restart: unless-stopped
     # ports:
     # - 9117:9117/tcp
     volumes:
-      - /volume1/docker/jackett:/config
+      - /volume1/docker/jackett/config:/config
     depends_on:
       gluetun:
         condition: service_healthy
@@ -84,7 +84,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /volume1/docker/appdata/prowlarr:/config
+      - /volume1/docker/prowlarr/config:/config
       - /volume1/Media:/data
     depends_on:
       gluetun:
