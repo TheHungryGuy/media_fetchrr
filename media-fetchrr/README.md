@@ -31,6 +31,37 @@ This setup routes multiple media services through a VPN using [Gluetun](https://
   - 9117: Jackett
   - 8888, 8388 (HTTP/Shadowsocks)
 
+## Connecting to Other Containers
+
+Other containers can access the Gluetun container using `network_mode`.
+
+<details>
+<summary><code>.../other/docker-compose.yml</code></summary>
+
+```yaml
+services:
+  myservice:
+    image: myimage
+    network_mode: container:gluetun
+```
+
+</details>
+
+If both are in the same `docker-compose` file, the service name can be used.
+
+<details>
+<summary><code>.../gluetun/docker-compose.yml</code></summary>
+
+```yaml
+services:
+  gluetun: ...
+  myservice:
+    image: myimage
+    network_mode: service:gluetun
+```
+
+</details>
+
 ### 🧲 qBittorrent
 
 - Runs entirely through Gluetun using `network_mode: service:gluetun`
