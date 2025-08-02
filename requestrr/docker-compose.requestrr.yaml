@@ -3,10 +3,10 @@ services:
   requestrr:
     container_name: requestrr
     hostname: requestrr
-    image: lscr.io/linuxserver/requestrr:latest
+    image: darkalfx/requestrr
     restart: unless-stopped
     ports:
-      - 4545:4545/tcp
+      - 4545:4545
     volumes:
-      - /volume1/docker/requestrr:/config
+      - /volume1/docker/requestrr/config:/root/config
     network_mode: bridge
