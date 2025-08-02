@@ -102,9 +102,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
+      - /volume1/docker/radarr/config:/config
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
-      - /volume1/docker/appdata/radarr:/config
     depends_on:
       gluetun:
         condition: service_healthy
@@ -146,9 +146,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
+      - /volume1/docker/appdata/bazarr:/config
       - /volume1/Media/media:/data/media
       - /etc/localtime:/etc/localtime:ro
-      - /volume1/docker/appdata/bazarr:/config
     networks:
       - fetchrr_net
   #===========================================================#
