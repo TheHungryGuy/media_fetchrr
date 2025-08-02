@@ -4,9 +4,9 @@ services:
     container_name: requestrr
     hostname: requestrr
     image: lscr.io/linuxserver/requestrr:latest
-    network_mode: bridge
+    restart: unless-stopped
     ports:
       - 4545:4545/tcp
-    restart: unless-stopped
     volumes:
       - /volume1/docker/requestrr:/config
+    network_mode: bridge
