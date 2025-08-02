@@ -18,3 +18,7 @@ services:
     volumes:
       - /volume1/docker/jellyfin/config:/config
       - /volume1/Media/media:/bigdata/media
+    devices:
+      # VAAPI Devices (examples)
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
