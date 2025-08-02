@@ -123,7 +123,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /volume1/docker/appdata/sonarr:/config
+      - /volume1/docker/sonarr/config:/config
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -146,7 +146,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /volume1/docker/appdata/bazarr:/config
+      - /volume1/docker/bazarr/config:/config
       - /volume1/Media/media:/data/media
       - /etc/localtime:/etc/localtime:ro
     networks:
