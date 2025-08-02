@@ -1,0 +1,22 @@
+---
+version: "2.1"
+services:
+  plex:
+    container_name: plex
+    image: lscr.io/linuxserver/plex:latest
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VERSION=docker
+      - PLEX_CLAIM=${PLEX_CLAIM}
+      - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
+    volumes:
+      - /volume1/docker/plex/config:/config
+      - /volume1/Media:/data
+    network_mode: host
+    devices:
+      # VAAPI Devices (examples)
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
