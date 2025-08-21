@@ -61,20 +61,20 @@ services:
     # networks:
     #   - fetchrr_net
   #===========================================================#
-  jackett:
-    container_name: jackett
-    image: linuxserver/jackett:latest
-    restart: unless-stopped
-    # ports:
-    # - 9117:9117/tcp
-    volumes:
-      - /volume2/docker/jackett/config:/config
-    depends_on:
-      gluetun:
-        condition: service_healthy
-    network_mode: service:gluetun # Use the VPN network
-    # networks:
-    #   - fetchrr_net
+  # jackett:
+  #   container_name: jackett
+  #   image: linuxserver/jackett:latest
+  #   restart: unless-stopped
+  #   # ports:
+  #   # - 9117:9117/tcp
+  #   volumes:
+  #     - /volume2/docker/jackett/config:/config
+  #   depends_on:
+  #     gluetun:
+  #       condition: service_healthy
+  #   network_mode: service:gluetun # Use the VPN network
+  #   # networks:
+  #   #   - fetchrr_net
   #===========================================================#
   prowlarr:
     container_name: prowlarrr
