@@ -13,7 +13,7 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
     volumes:
-      - /volume1/docker/plex/config:/config
+      - /volume2/docker/plex/config:/config
       - /volume1/Media:/data
     network_mode: host
     devices:

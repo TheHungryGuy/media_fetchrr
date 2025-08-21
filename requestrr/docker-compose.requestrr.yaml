@@ -8,5 +8,5 @@ services:
     ports:
       - 4545:4545
     volumes:
-      - /volume1/docker/requestrr/config:/root/config
+      - /volume2/docker/requestrr/config:/root/config
     network_mode: bridge

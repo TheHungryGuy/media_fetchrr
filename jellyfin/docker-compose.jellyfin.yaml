@@ -16,7 +16,7 @@ services:
       - TZ=${TZ}
       # - JELLYFIN_PublishedServerUrl=192.168.1.240 #optional
     volumes:
-      - /volume1/docker/jellyfin/config:/config
+      - /volume2/docker/jellyfin/config:/config
       - /volume1/Media/media:/bigdata/media
     devices:
       # VAAPI Devices (examples)
