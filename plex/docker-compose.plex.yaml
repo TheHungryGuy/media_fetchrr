@@ -11,6 +11,7 @@ services:
       - TZ=${TZ}
       - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM}
+      - PLEX_CODEC_DIR=/config/codecs
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
     volumes:
       - /volume2/docker/plex/config:/config
@@ -20,6 +21,7 @@ services:
     network_mode: host
     devices:
       # VAAPI Devices (examples)
+      - /dev/dri:/dev/dri
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/dri/card0:/dev/dri/card0
 
