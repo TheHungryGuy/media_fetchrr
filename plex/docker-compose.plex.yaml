@@ -15,7 +15,7 @@ services:
     volumes:
       - /volume2/docker/plex/config:/config
       - /volume1/Media:/data
-      - /dev/shm/plex-transcode:/transcode
+      - /dev/shm:/transcode
     network_mode: host
     devices:
       # VAAPI Devices (examples)
