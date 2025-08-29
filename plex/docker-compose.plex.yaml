@@ -15,8 +15,16 @@ services:
     volumes:
       - /volume2/docker/plex/config:/config
       - /volume1/Media:/data
+        # Mount the transcode directory to the tmpfs volume
+      - transcode_temp:/transcode
     network_mode: host
     devices:
-      # VAAPI Devices (examples)
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card0:/dev/dri/card0
+      # Pass the entire /dev/dri device group for Intel Quick Sync
+      - /dev/dri:/dev/dri
+
+volumes:
+  transcode_temp:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=6g,uid=${PUID},gid=${PGID}
