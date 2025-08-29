@@ -19,8 +19,9 @@ services:
       - transcode_temp:/transcode
     network_mode: host
     devices:
-      # Pass the entire /dev/dri device group for Intel Quick Sync
-      - /dev/dri:/dev/dri
+      # VAAPI Devices (examples)
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
 
 volumes:
   transcode_temp:
