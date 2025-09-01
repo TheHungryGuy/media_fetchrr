@@ -30,7 +30,7 @@ services:
       - /volume2/docker/tdarr/configs:/app/configs
       - /volume2/docker/tdarr/logs:/app/logs
       - /volume2/docker/tdarr/transcode_cache:/temp
-      - /volume1/Media:/media
+      - /volume1/Media/media:/media
     network_mode: bridge
     devices:
       - /dev/dri:/dev/dri
