@@ -9,7 +9,7 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
       # Default HTTP Port
-      - "80:80/tcp"
+      - "8080:80/tcp"
     environment:
       TZ: "${TZ}"
       FTLCONF_webserver_api_password: "${PASSWORD}"
