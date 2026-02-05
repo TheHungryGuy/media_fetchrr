@@ -1,0 +1,9 @@
+services:
+  dolce:
+    container_name: dolce
+    image: dangrie158/dolce:latest
+    restart: unless-stopped
+    environment:
+      DISCORD_WEBHOOK: https://discord.com/api/webhooks/${DISCORD_WEBHOOK}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
