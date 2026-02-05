@@ -1,0 +1,19 @@
+services:
+  wud:
+    container_name: wud
+    image: getwud/wud
+    ports:
+      - 3000:3000
+    environment:
+      WUD_REGISTRY_LSCR_PRIVATE_USERNAME: ${LSCR_USER}
+      WUD_REGISTRY_LSCR_PRIVATE_TOKEN=: $(LSCR_TOKEN)
+      # Discord webhook
+      WUD_TRIGGER_DISCORD_Jellyflix_URL: https://discord.com/api/webhooks/${DISCORD_WEBHOOK}
+
+      # Optional: watch only labeled containers
+      # WUD_WATCHER_FILTER_LABEL: wud.watch=true
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    restart: unless-stopped
