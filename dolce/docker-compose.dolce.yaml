@@ -10,4 +10,5 @@ services:
       TZ: ${TZ}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /volume2/docker/dolce/:/var/run/dolce/
+      # - /volume2/docker/dolce/:/var/run/dolce/
+      - /volume2/docker/dolce/lockfile:/var/run/dolce/lockfile
