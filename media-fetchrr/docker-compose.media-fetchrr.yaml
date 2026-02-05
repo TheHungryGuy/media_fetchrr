@@ -138,7 +138,7 @@ services:
   #===========================================================#
   bazarr:
     container_name: bazarr
-    image: ghcr.io/hotio/bazarr:nightly
+    image: ghcr.io/hotio/bazarr:latest
     restart: unless-stopped
     ports:
       - 6767:6767/tcp
