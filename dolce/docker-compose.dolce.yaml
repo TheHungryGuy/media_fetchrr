@@ -4,6 +4,9 @@ services:
     image: dangrie158/dolce:latest
     restart: unless-stopped
     environment:
+      DOCKER_HOST: /var/run/docker.sock
       DISCORD_WEBHOOK: https://discord.com/api/webhooks/${DISCORD_WEBHOOK}
+      DOLCE_SUPERVISION_MODE: ALL
+      TZ: ${TZ}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
