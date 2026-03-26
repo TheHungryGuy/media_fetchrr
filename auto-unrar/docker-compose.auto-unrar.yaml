@@ -1,11 +1,17 @@
 version: "3.8"
 services:
   auto-unrar:
+    container_name: auto-unrar
     image: nicxx2/auto-unrar:latest
     volumes:
       - /volume1/Media/torrents/TL_DONOTDELETE_sonarr:/data
       # - /path/to/your/directory/to/add/extracted/data:/extract_to  # Optional: Specify a directory for extracted files
+    restart: unless-stopped
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=002
+      - TZ=${TZ}
       - SOURCE_DIRECTORY=/data
       - SLEEP_TIME=86400 # Default: Scan every hour
       # - OVERWRITE_FILES=false # Set to true to overwrite existing files during extraction
