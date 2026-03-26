@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  auto-unrar:
+    image: nicxx2/auto-unrar:latest
+    volumes:
+      - /volume1/Media/torrents/TL_DONOTDELETE_sonarr:/data
+      # - /path/to/your/directory/to/add/extracted/data:/extract_to  # Optional: Specify a directory for extracted files
+    environment:
+      - SOURCE_DIRECTORY=/data
+      - SLEEP_TIME=86400 # Default: Scan every hour
+      # - OVERWRITE_FILES=false # Set to true to overwrite existing files during extraction
+      # - DO_NOT_USE_MARKERS=false # Set to true to ignore markers and extract all archives
+      # - EXTRACT_TO_DIRECTORY=/extract_to #Optional
+      # - DELETE_RAR_AFTER_EXTRACTION=false # Set to true to delete RAR files post-extraction
