@@ -10,8 +10,10 @@ services:
     restart: unless-stopped
     ports:
       - 8888:8888/tcp # HTTP proxy qbit?
-      - 8388:8388/tcp # Shadowsocks qbit
-      - 8388:8388/udp # Shadowsocks qbit
+      - 6881:6881 #qbittorent1 TCP port
+      - 6881:6881/udp #qbittorent1 UDP port
+      - 6882:6882 #qbittorent2 TCP port
+      - 6882:6882/udp #qbittorent2 UDP port
       - 8090:8090 #qbittorrent port
       - 8092:8092 # qbit2 WebUI
       - 8989:8989 # sonarr
@@ -52,6 +54,7 @@ services:
       - UMASK=002
       - TZ=${TZ}
       - WEBUI_PORT=8090
+      - TORRENTING_PORT=6881
       # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
     volumes:
       - /volume2/docker/qbittorrent/config:/config
@@ -73,6 +76,7 @@ services:
       - UMASK=002
       - TZ=${TZ}
       - WEBUI_PORT=8092
+      - TORRENTING_PORT=6882
       # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
     volumes:
       - /volume2/docker/qbittorrent2/config:/config
