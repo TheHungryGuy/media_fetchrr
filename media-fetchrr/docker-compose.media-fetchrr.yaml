@@ -59,27 +59,6 @@ services:
     # networks:
     #   - fetchrr_net
 
-  #===========================================================
-  qbittorrent2:
-    container_name: qbittorrent2
-    image: lscr.io/linuxserver/qbittorrent
-    restart: unless-stopped
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - UMASK=002
-      - TZ=${TZ}
-      - WEBUI_PORT=8092
-      - TORRENTING_PORT=6882
-      # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
-    volumes:
-      - /volume2/docker/qbittorrent2/config:/config
-      - /volume1/Media:/data
-    # depends_on:
-    #   - gluetun
-    network_mode: service:gluetun # Use the VPN network
-    # networks:
-    #   - fetchrr_net
   #===========================================================#
   # jackett:
   #   container_name: jackett
