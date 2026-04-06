@@ -4,8 +4,8 @@ networks:
 
 services:
   #===========================================================#
-  gluetun:
-    container_name: gluetun
+  gluetun2:
+    container_name: gluetun2
     image: qmcgaw/gluetun:latest
     restart: unless-stopped
     ports:
@@ -26,7 +26,7 @@ services:
       - SERVER_COUNTRIES=$country
       # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
     volumes:
-      - /volume2/docker/gluetun:/gluetun
+      - /volume2/docker/gluetun2:/gluetun
     networks:
       - fetchrr_net
     cap_add:
