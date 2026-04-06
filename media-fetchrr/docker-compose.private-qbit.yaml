@@ -51,6 +51,6 @@ services:
       - /volume1/Media:/data
     # depends_on:
     #   - gluetun
-    network_mode: service:gluetun # Use the VPN network
+    network_mode: service:gluetun2 # Use the VPN network
     # networks:
     #   - fetchrr_net
