@@ -9,13 +9,7 @@ services:
     image: qmcgaw/gluetun:latest
     restart: unless-stopped
     ports:
-      - 8888:8888/tcp # HTTP proxy qbit?
-      - 6881:6881 #qbittorent1 TCP port
-      - 6881:6881/udp #qbittorent1 UDP port
-      - 6882:6882 #qbittorent2 TCP port
-      - 6882:6882/udp #qbittorent2 UDP port
-      - 8090:8090 #qbittorrent port
-      - 8092:8092 # qbit2 WebUI
+      - 8090:8090 # qbittorrent
       - 8989:8989 # sonarr
       - 9696:9696 # prowlarr
       - 7878:7878 # radarr
@@ -28,7 +22,8 @@ services:
       - VPN_PORT_FORWARDING=on
       - PORT_FORWARD_ONLY=on
       - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24 #Allow access to local containers
-      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'echo Updating qBittorrent port to {{PORTS}} && wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8090/api/v2/app/setPreferences 2>&1 && echo Updating qBittorrent2 port to {{PORTS}} && wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8092/api/v2/app/setPreferences 2>&1'
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'echo Updating qBittorrent port to {{PORTS}} && wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8090/api/v2/app/setPreferences 2>&1'
+
       ### Wireguard Settings
       - VPN_TYPE=wireguard
       - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
@@ -54,7 +49,6 @@ services:
       - UMASK=002
       - TZ=${TZ}
       - WEBUI_PORT=8090
-      - TORRENTING_PORT=6881
       # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
     volumes:
       - /volume2/docker/qbittorrent/config:/config
