@@ -12,3 +12,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /volume2/docker/dolce/:/var/run/dolce/
       - /volume2/docker/dolce/dolce.db:/var/run/dolce/dolce.db
+    entrypoint: ["/bin/sh", "-c", "sleep 60 && /dolce/dolce"] # Wait for 60 seconds after power outage so were not spammed with as many notifications
