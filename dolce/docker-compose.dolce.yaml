@@ -12,3 +12,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /volume2/docker/dolce/:/var/run/dolce/
       - /volume2/docker/dolce/dolce.db:/var/run/dolce/dolce.db
+      - /volume2/docker/dolce/templates:/var/dolce-custom-templates
