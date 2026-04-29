@@ -1,0 +1,187 @@
+<%-
+    function color_text(text, color){
+        switch (color) {
+        case "success": return `\`\`\`diff\\n+${ text }\\n\`\`\``
+        case "warning": return `\`\`\`fix\\n${ text }\\n\`\`\``
+        case "error": return `\`\`\`diff\\n-${ text }\\n\`\`\``
+        default: return `\`\`\`\\n${ text }\\n\`\`\``
+        }
+    }
+
+    function group_events(events) {
+        const severityOrder = ['oom', 'kill', 'die', 'stop', 'pause'];
+        const containerGroups = {};
+
+        events.toSorted((a, b) => a.time - b.time).forEach(event => {
+            const name = event.actor_name;
+            if (!containerGroups[name]) containerGroups[name] = { cycles: [], latestTime: 0 };
+            
+            const container = containerGroups[name];
+            const isStart = event.Action === 'start' || event.Action === 'unpause';
+            const isHealth = event.Action.startsWith('health_status');
+            const isShutdown = !isStart && !isHealth;
+
+            const lastCycle = container.cycles[container.cycles.length - 1];
+            const needsNewCycle = !lastCycle || 
+                (isStart && lastCycle.shutdowns.length > 0) ||
+                (isShutdown && lastCycle.starts.length > 0 && lastCycle.shutdowns.length > 0);
+
+            if (needsNewCycle) {
+                container.cycles.push({ starts: [], shutdowns: [], health: [] });
+            }
+
+            const cycle = container.cycles[container.cycles.length - 1];
+
+            if (isStart) {
+                cycle.starts.push(event);
+            } else if (isHealth) {
+                const lastStart = cycle.starts[cycle.starts.length - 1];
+                if (lastStart) {
+                    if (!lastStart.health) lastStart.health = [];
+                    lastStart.health.push(event);
+                } else {
+                    cycle.health.push(event);
+                }
+            } else {
+                cycle.shutdowns.push(event);
+            }
+
+            container.latestTime = Math.max(container.latestTime, event.time);
+        });
+
+        const fields = [];
+
+        Object.entries(containerGroups)
+            .toSorted((a, b) => b[1].latestTime - a[1].latestTime)
+            .forEach(([container, { cycles }]) => {
+                cycles.toReversed().forEach((cycle, index) => {
+                    const fieldName = index === 0 ? container : '\u200b';
+
+                    cycle.starts.toSorted((a, b) => a.time - b.time).forEach(event => {
+                        const time = new Date(event.time * 1000).toLocaleTimeString();
+
+                        if (event.health && event.health.length > 0) {
+                            const sortedHealth = event.health.toSorted((a, b) => a.time - b.time);
+                            const lastHealth = sortedHealth[sortedHealth.length - 1];
+                            const isHealthy = lastHealth.Action.includes('healthy') && !lastHealth.Action.includes('unhealthy');
+                            const healthTime = new Date(lastHealth.time * 1000).toLocaleTimeString();
+                            const color = isHealthy ? 'success' : 'warning';
+                            fields.push({
+                                name: fieldName,
+                                container,
+                                value: color_text(`start → ${lastHealth.Action}  (${time} - ${healthTime})`, color)
+                            });
+                        } else {
+                            fields.push({
+                                name: fieldName,
+                                container,
+                                value: color_text(`start  (${time})`, 'success')
+                            });
+                        }
+                    });
+
+                    if (cycle.health.length > 0) {
+                        const sorted = cycle.health.toSorted((a, b) => a.time - b.time);
+                        const lastHealth = sorted[sorted.length - 1];
+                        const isHealthy = lastHealth.Action.includes('healthy') && !lastHealth.Action.includes('unhealthy');
+                        const color = isHealthy ? 'success' : 'warning';
+                        const actions = sorted.map(e => e.Action).join(' → ');
+                        const timeStart = new Date(sorted[0].time * 1000).toLocaleTimeString();
+                        const timeEnd = sorted[0].time !== sorted[sorted.length-1].time
+                            ? ` - ${new Date(sorted[sorted.length-1].time * 1000).toLocaleTimeString()}`
+                            : '';
+                        fields.push({
+                            name: fieldName,
+                            container,
+                            value: color_text(`${actions}  (${timeStart}${timeEnd})`, color)
+                        });
+                    }
+
+                    if (cycle.shutdowns.length > 0) {
+                        const sorted = cycle.shutdowns.toSorted((a, b) => a.time - b.time);
+                        const actions = sorted.map(e => e.Action).join(' → ');
+                        const timeStart = new Date(sorted[0].time * 1000).toLocaleTimeString();
+                        const timeEnd = sorted.length > 1 && sorted[0].time !== sorted[sorted.length-1].time
+                            ? ` - ${new Date(sorted[sorted.length-1].time * 1000).toLocaleTimeString()}`
+                            : '';
+                        const worstEvent = sorted.find(e => severityOrder.indexOf(e.Action) ===
+                            Math.min(...sorted.map(e => severityOrder.indexOf(e.Action))));
+                        fields.push({
+                            name: fieldName,
+                            container,
+                            value: color_text(`${actions}  (${timeStart}${timeEnd})`, it.get_event_class(worstEvent))
+                        });
+                    }
+                });
+            });
+
+        return fields;
+    }
+
+    const MAX_FIELD_LENGTH = 1024;
+
+    function truncate_field(value) {
+        if (value.length <= MAX_FIELD_LENGTH) return value;
+        const lines = value.split('\\n');
+        const result = [];
+        for (const line of lines) {
+            if ((result.join('\\n') + '\\n' + line).length > MAX_FIELD_LENGTH - 30) break;
+            result.push(line);
+        }
+        const truncated = lines.length - result.length;
+        return result.join('\\n') + `\\n...+${truncated} more actions`;
+    }
+
+    const fields = group_events(it.events);
+    const embed1Fields = fields.slice(0, 10);
+    const embed2Fields = fields.slice(10, 20);
+    const overflowFields = fields.slice(20);
+
+    // Count distinct containers in overflow
+    const overflowContainers = new Set(overflowFields.map(f => f.container)).size;
+
+    const thumbnailUrl = "https://dangrie158.github.io/dolce/master/assets/logo_compact.png";
+    const authorUrl = "https://github.com/dangrie158/dolce/tree/master";
+-%>
+{
+    "content": "",
+    "tts": false,
+    "embeds": [
+        {
+            "type": "rich",
+            "title": "Container Status Changed",
+            "description": "There are changes to the status of your containers. Grouped by container, most recent activity first.",
+            "color": 14961766,
+            "fields": [
+            <%~ embed1Fields.map(field => `
+                {
+                    "name": "${field.name}",
+                    "value": "${truncate_field(field.value)}"
+                }`).join(",")
+            %>
+            ],
+            "thumbnail": { "url": "<%= thumbnailUrl %>", "height": 0, "width": 0 },
+            "author": { "name": "Dolce@<%= it.hostname %>", "url": "<%= authorUrl %>" },
+            "footer": { "text": "If something new happens, you won't be bothered again with updates until <%= it.earliest_next_update.toLocaleString() %>." }
+        }
+        <%~ embed2Fields.length > 0 ? `,{
+            "type": "rich",
+            "title": "Container Status Changed (continued)",
+            "description": "There are changes to the status of your containers. Grouped by container, most recent activity first.",
+            "color": 14961766,
+            "fields": [
+                ${embed2Fields.map(field => `{
+                    "name": "${field.name}",
+                    "value": "${truncate_field(field.value)}"
+                }`).join(",")}
+                ${overflowContainers > 0 ? `,{
+                    "name": "...and more",
+                    "value": "${overflowContainers} container${overflowContainers > 1 ? 's' : ''} omitted"
+                }` : ''}
+            ],
+            "thumbnail": { "url": "${thumbnailUrl}", "height": 0, "width": 0 },
+            "author": { "name": "Dolce@<%= it.hostname %>", "url": "${authorUrl}" },
+            "footer": { "text": "If something new happens, you won't be bothered again with updates until <%= it.earliest_next_update.toLocaleString() %>." }
+        }` : '' %>
+    ]
+}

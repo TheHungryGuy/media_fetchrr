@@ -8,6 +8,9 @@ services:
       DISCORD_WEBHOOK: https://discord.com/api/webhooks/${DISCORD_WEBHOOK}
       DOLCE_SUPERVISION_MODE: ALL
       TZ: ${TZ}
+      DOLCE_MIN_TIMEOUT: 60
+      DOLCE_MULTIPLIER: 2.5
+      DOLCE_MAX_TIMEOUT: 10800
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /volume2/docker/dolce/:/var/run/dolce/
