@@ -41,7 +41,7 @@ services:
   #===========================================================#
   gluetun2:
     container_name: gluetun2
-    hostname: mediagluetun2
+    hostname: mediagluetun
     image: qmcgaw/gluetun:latest
     restart: unless-stopped
     ports:
@@ -120,11 +120,6 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-    dns:
-      - 1.1.1.1
-      - 8.8.8.8
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1
     volumes:
       - /volume2/docker/prowlarr/config:/config
       - /volume1/Media:/data
