@@ -6,6 +6,7 @@ services:
   #===========================================================#
   gluetun:
     container_name: gluetun
+    hostname: mediagluetun
     image: qmcgaw/gluetun:latest
     restart: unless-stopped
     ports:
@@ -37,6 +38,37 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
+  #===========================================================#
+  gluetun2:
+    container_name: gluetun2
+    hostname: mediagluetun2
+    image: qmcgaw/gluetun:latest
+    restart: unless-stopped
+    ports:
+      - 8092:8092 # qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - TZ=${TZ}
+      - VPN_PORT_FORWARDING=on
+      - PORT_FORWARD_ONLY=on
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24 #Allow access to local containers
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'echo Updating qBittorrent port to {{PORTS}} && wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8092/api/v2/app/setPreferences 2>&1'
+
+      ### Wireguard Settings
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
+      - SERVER_COUNTRIES=$country
+      # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
+    volumes:
+      - /volume2/docker/gluetun2:/gluetun
+    networks:
+      - fetchrr_net
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
 
   #===========================================================
   qbittorrent:
@@ -60,20 +92,25 @@ services:
     #   - fetchrr_net
 
   #===========================================================#
-  # jackett:
-  #   container_name: jackett
-  #   image: linuxserver/jackett:latest
-  #   restart: unless-stopped
-  #   # ports:
-  #   # - 9117:9117/tcp
-  #   volumes:
-  #     - /volume2/docker/jackett/config:/config
-  #   depends_on:
-  #     gluetun:
-  #       condition: service_healthy
-  #   network_mode: service:gluetun # Use the VPN network
-  #   # networks:
-  #   #   - fetchrr_net
+  qbittorrent2:
+    container_name: qbittorrent2
+    image: lscr.io/linuxserver/qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=002
+      - TZ=${TZ}
+      - WEBUI_PORT=8092
+      # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
+    volumes:
+      - /volume2/docker/qbittorrent2/config:/config
+      - /volume1/Media:/data
+    # depends_on:
+    #   - gluetun
+    network_mode: service:gluetun2 # Use the VPN network
+    # networks:
+    #   - fetchrr_net
   #===========================================================#
   prowlarr:
     container_name: prowlarrr
