@@ -2,6 +2,10 @@
 #---------------------------------------------------------------------#
 #     Homarr - A simple, yet powerful dashboard for your server.      #
 #---------------------------------------------------------------------#
+
+networks:
+  fetchrr_net:
+    external: true
 services:
   homarr:
     container_name: homarr
@@ -11,6 +15,8 @@ services:
       - "7575:7575"
     environment:
       - SECRET_ENCRYPTION_KEY=${SECRET_ENCRYPTION_KEY} # <--- can be generated with `openssl rand -hex 32`
+    networks:
+      - fetchrr_net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
       - /volume2/docker/homarr/appdata:/appdata
