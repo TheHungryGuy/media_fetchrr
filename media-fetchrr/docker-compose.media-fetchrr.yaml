@@ -234,3 +234,32 @@ services:
     networks:
       - fetchrr_net
   #===========================================================#
+  seerr:
+    container_name: seerr
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    restart: unless-stopped
+    ports:
+      - 5055:5055
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=info
+    volumes:
+      - /volume2/docker/seerr/config:/app/config
+    networks:
+      - fetchrr_net
+  #===========================================================#
+  doplarr:
+    container_name: doplarr
+    image: ghcr.io/kiranshila/doplarr:latest
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - DISCORD__TOKEN=$doplarrDiscordToken
+      - OVERSEERR__URL=http://seerr:5055
+      - OVERSEERR__API=$seerrApiKey
+    depends_on:
+      - seerr
+    networks:
+      - fetchrr_net
+  #===========================================================#
