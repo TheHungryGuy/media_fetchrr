@@ -257,9 +257,9 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - DISCORD__TOKEN=$doplarrDiscordToken
+      - DISCORD__TOKEN=${bot_token}
       - OVERSEERR__URL=http://seerr:5055
-      - OVERSEERR__API=$seerrApiKey
+      - OVERSEERR__API=${seer_api_token}
     volumes:
       - /volume2/docker/doplarr/config:/config
     depends_on:
