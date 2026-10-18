@@ -251,7 +251,7 @@ services:
   #===========================================================#
   doplarr:
     container_name: doplarr
-    image: lscr.io/linuxserver/doplarr:v3.6.3-ls95
+    image: ghcr.io/activexray/doplarr_rs:latest
     restart: unless-stopped
     environment:
       - PUID=${PUID}
