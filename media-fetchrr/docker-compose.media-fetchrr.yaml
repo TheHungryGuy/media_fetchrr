@@ -154,8 +154,8 @@ services:
     logging:
       driver: json-file
   #===========================================================#
-  sonarr:
-    container_name: sonarr
+  sonarr-anime:
+    container_name: sonarr-anime
     image: ghcr.io/hotio/sonarr:latest
     restart: unless-stopped
     ports:
@@ -165,7 +165,30 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /volume2/docker/sonarr/config:/config
+      - /volume2/docker/sonarr/config:/config # existing config, kept in place
+      - /volume1/Media:/data
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    # network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
+    logging:
+      driver: json-file
+  #===========================================================#
+  sonarr-tv:
+    container_name: sonarr-tv
+    image: ghcr.io/hotio/sonarr:latest
+    restart: unless-stopped
+    ports:
+      - 8990:8989
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume2/docker/sonarr-tv/config:/config
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -189,6 +212,23 @@ services:
       - TZ=${TZ}
     volumes:
       - /volume2/docker/bazarr/config:/config
+      - /volume1/Media/media:/data/media
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - fetchrr_net
+  #===========================================================#
+  bazarr-tv:
+    container_name: bazarr-tv
+    image: ghcr.io/hotio/bazarr:latest
+    restart: unless-stopped
+    ports:
+      - 6768:6767/tcp
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume2/docker/bazarr-tv/config:/config
       - /volume1/Media/media:/data/media
       - /etc/localtime:/etc/localtime:ro
     networks:
