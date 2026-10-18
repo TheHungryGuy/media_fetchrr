@@ -251,13 +251,17 @@ services:
   #===========================================================#
   doplarr:
     container_name: doplarr
-    image: ghcr.io/kiranshila/doplarr:latest
+    image: lscr.io/linuxserver/doplarr:latest
     restart: unless-stopped
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - TZ=${TZ}
       - DISCORD__TOKEN=$doplarrDiscordToken
       - OVERSEERR__URL=http://seerr:5055
       - OVERSEERR__API=$seerrApiKey
+    volumes:
+      - /volume2/docker/doplarr/config:/config
     depends_on:
       - seerr
     networks:
