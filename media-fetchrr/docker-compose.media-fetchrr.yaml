@@ -254,16 +254,17 @@ services:
     image: ghcr.io/activexray/doplarr_rs:latest
     restart: unless-stopped
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
       - TZ=${TZ}
-      - DISCORD__TOKEN=${bot_token}
-      - OVERSEERR__URL=http://seerr:5055
-      - OVERSEERR__API=${seer_api_token}
+      - DISCORD_TOKEN=${bot_token}
+      - RADARR_API_KEY=${radarr_api_key}
+      - SONARR_TV_API_KEY=${sonarr_tv_api_key}
+      - SONARR_ANIME_API_KEY=${sonarr_anime_api_key}
     volumes:
-      - /volume2/docker/doplarr/config:/config
+      - /volume2/docker/doplarr/config/config.toml:/config.toml:ro
     depends_on:
-      - seerr
+      - radarr
+      - sonarr-tv
+      - sonarr-anime
     networks:
       - fetchrr_net
   #===========================================================#
