@@ -112,7 +112,7 @@ services:
     #   - fetchrr_net
   #===========================================================#
   prowlarr:
-    container_name: prowlarrr
+    container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:develop
     restart: unless-stopped
     ports:
