@@ -187,6 +187,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
+      - SONARR_PUBLIC_URL=${SONARR_PUBLIC_URL}
     volumes:
       - /volume2/docker/sonarr-tv/config:/config
       - /volume1/Media:/data
