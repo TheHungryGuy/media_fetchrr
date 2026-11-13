@@ -172,7 +172,7 @@ services:
       - /volume2/docker/sonarr/config:/config # existing config, kept in place
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
-      - /volume1/Media/arr-ops/ui-tint/sonarr-anime.sh:/etc/cont-init.d/99-ui-tint:ro
+      - /volume1/Media/arr-ops/ui-tint/sonarr-anime.sh:/etc/s6-overlay/init-hook-app:ro
     depends_on:
       gluetun:
         condition: service_healthy
@@ -198,7 +198,7 @@ services:
       - /volume2/docker/sonarr-tv/config:/config
       - /volume1/Media:/data
       - /etc/localtime:/etc/localtime:ro
-      - /volume1/Media/arr-ops/ui-tint/sonarr-tv.sh:/etc/cont-init.d/99-ui-tint:ro
+      - /volume1/Media/arr-ops/ui-tint/sonarr-tv.sh:/etc/s6-overlay/init-hook-app:ro
     depends_on:
       gluetun:
         condition: service_healthy
