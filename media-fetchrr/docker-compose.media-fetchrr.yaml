@@ -40,7 +40,7 @@ services:
   #===========================================================#
   gluetun2:
     container_name: gluetun2
-    hostname: mediagluetun
+    hostname: mediagluetun   # NOTE: same hostname as gluetun -> "mediagluetun" resolves to both. Apps must use gluetun / gluetun2.
     image: qmcgaw/gluetun:latest
     restart: unless-stopped
     ports:
@@ -141,6 +141,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}      # same Discord webhook; bot name set per message
+      - RADARR_PUBLIC_URL=${RADARR_PUBLIC_URL}      # e.g. http://<nas-ip>:7878 (alert links)
     volumes:
       - /volume2/docker/radarr/config:/config
       - /volume1/Media:/data
@@ -164,6 +166,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
+      - SONARR_PUBLIC_URL=${SONARR_ANIME_PUBLIC_URL}   # e.g. http://<nas-ip>:8989 (own variable, not sonarr-tv's)
     volumes:
       - /volume2/docker/sonarr/config:/config # existing config, kept in place
       - /volume1/Media:/data
@@ -267,6 +271,61 @@ services:
       - radarr
       - sonarr-tv
       - sonarr-anime
+    networks:
+      - fetchrr_net
+  #===========================================================#
+  arr-ops:
+    # Management container: Claude Code + ops scripts/scheduler. Image built locally
+    # (Portainer -> Images -> Build, name arr-ops:local) from claude-plans/arr-ops/build/Dockerfile.
+    container_name: arr-ops
+    image: arr-ops:local
+    pull_policy: never
+    init: true
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      # Sonarr TV
+      - SONARR_TV_URL=http://sonarr-tv:8989
+      - SONARR_TV_API_KEY=${sonarr_tv_api_key}
+      - SONARR_TV_PUBLIC_URL=${SONARR_PUBLIC_URL}
+      # Sonarr Anime
+      - SONARR_ANIME_URL=http://sonarr-anime:8989
+      - SONARR_ANIME_API_KEY=${sonarr_anime_api_key}
+      - SONARR_ANIME_PUBLIC_URL=${SONARR_ANIME_PUBLIC_URL}
+      # Radarr
+      - RADARR_URL=http://radarr:7878
+      - RADARR_API_KEY=${radarr_api_key}
+      - RADARR_PUBLIC_URL=${RADARR_PUBLIC_URL}
+      # Prowlarr
+      - PROWLARR_URL=http://prowlarr:9696
+      - PROWLARR_API_KEY=${prowlarr_api_key}
+      # qBittorrent: each through its OWN gluetun (never "mediagluetun")
+      - QBIT_PUBLIC_URL=http://gluetun:8090
+      - QBIT_PRIVATE_URL=http://gluetun2:8092
+      - QBIT_USER=${qbit_user}
+      - QBIT_PUBLIC_PASSWORD=${qbit_password}
+      - QBIT_PRIVATE_PASSWORD=${qbit2_password}
+      # Bazarr x2, Seerr (optional; empty variables are fine)
+      - BAZARR_URL=http://bazarr:6767
+      - BAZARR_API_KEY=${bazarr_api_key}
+      - BAZARR_TV_URL=http://bazarr-tv:6767
+      - BAZARR_TV_API_KEY=${bazarr_tv_api_key}
+      - SEERR_URL=http://seerr:5055
+      - SEERR_API_KEY=${seerr_api_key}
+      # Plex on the NAS itself (172.19.0.1 = fetchrr_net gateway = the host; LAN IP isn't reachable from here)
+      - PLEX_URL=http://172.19.0.1:32400
+      - PLEX_TOKEN=${plex_token}
+      # Discord alerts
+      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
+    volumes:
+      - /volume2/docker/arr-ops/home:/home/ops          # Claude Code install, login, memory
+      - /volume2/docker/arr-ops/workspace:/workspace    # scripts, crontab, state, logs, CLAUDE.md
+      - /volume1/Media:/data                            # same view as the apps (hardlinks work)
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - sonarr-tv
+      - sonarr-anime
+      - radarr
     networks:
       - fetchrr_net
   #===========================================================#
