@@ -319,6 +319,7 @@ services:
       - PLEX_TOKEN=${plex_token}
       # Discord alerts
       - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
+      - ANTHROPIC_API_KEY=${claude_key}
     volumes:
       - /volume2/docker/arr-ops/home:/home/ops          # Claude Code install, login, memory
       - /volume2/docker/arr-ops/workspace:/workspace    # scripts, crontab, state, logs, CLAUDE.md
