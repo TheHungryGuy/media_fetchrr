@@ -1,82 +1,272 @@
-# Changes to the Portainer stack. Values come from Portainer's stack environment variables
-# (same as doplarr already does) — never paste secret values into the YAML itself.
+networks:
+  fetchrr_net:
+    external: true
 
-# ---------------------------------------------------------------------------
-# 1) radarr  — add an environment block entry (keep the existing ones)
-# ---------------------------------------------------------------------------
-#    environment:
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#      - TZ=${TZ}
-#      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}      # same Discord webhook; bot name is set per message
-#      - RADARR_PUBLIC_URL=${RADARR_PUBLIC_URL}      # NEW stack variable, e.g. http://<nas-ip>:7878
+services:
+  #===========================================================#
+  gluetun:
+    container_name: gluetun
+    hostname: mediagluetun
+    image: qmcgaw/gluetun:latest
+    restart: unless-stopped
+    ports:
+      - 8090:8090 # qbittorrent
+      # - 8989:8989 # sonarr
+      # - 9696:9696 # prowlarr
+      # - 7878:7878 # radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - TZ=${TZ}
+      - VPN_PORT_FORWARDING=on
+      - PORT_FORWARD_ONLY=on
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24 #Allow access to local containers
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'echo Updating qBittorrent port to {{PORTS}} && wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8090/api/v2/app/setPreferences 2>&1'
 
-# ---------------------------------------------------------------------------
-# 2) sonarr-anime — the variable inside the container keeps the name SONARR_PUBLIC_URL
-#    (that's what the script reads), but it's fed from a NEW stack variable so it
-#    doesn't point at sonarr-tv's URL.
-# ---------------------------------------------------------------------------
-#    environment:
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#      - TZ=${TZ}
-#      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
-#      - SONARR_PUBLIC_URL=${SONARR_ANIME_PUBLIC_URL}   # NEW stack variable, e.g. http://<nas-ip>:8989
+      ### Wireguard Settings
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=$wgPrivateKey
+      - SERVER_COUNTRIES=$country
+      # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
+    volumes:
+      - /volume2/docker/gluetun:/gluetun
+    networks:
+      - fetchrr_net
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+  #===========================================================#
+  gluetun2:
+    container_name: gluetun2
+    hostname: mediagluetun
+    image: qmcgaw/gluetun:latest
+    restart: unless-stopped
+    ports:
+      - 8092:8092 # qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - TZ=${TZ}
+      - VPN_PORT_FORWARDING=on
+      - PORT_FORWARD_ONLY=on
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24 #Allow access to local containers
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'echo Updating qBittorrent port to {{PORTS}} && wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8092/api/v2/app/setPreferences 2>&1'
 
-# ---------------------------------------------------------------------------
-# 3) NEW service: arr-ops  (paste under services:)
-#    Image is built once on the NAS (see README step 2), so pull_policy: never.
-# ---------------------------------------------------------------------------
-  arr-ops:
-    container_name: arr-ops
-    image: arr-ops:local
-    pull_policy: never
+      ### Wireguard Settings
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=$wgPrivateKey2
+      - SERVER_COUNTRIES=$country
+      # - SERVER_HOSTNAMES=node-ca-13.protonvpn.net
+    volumes:
+      - /volume2/docker/gluetun2:/gluetun
+    networks:
+      - fetchrr_net
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+
+  #===========================================================
+  qbittorrent:
+    container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=002
+      - TZ=${TZ}
+      - WEBUI_PORT=8090
+      # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
+    volumes:
+      - /volume2/docker/qbittorrent/config:/config
+      - /volume1/Media:/data
+    # depends_on:
+    #   - gluetun
+    network_mode: service:gluetun # Use the VPN network
+    # networks:
+    #   - fetchrr_net
+
+  #===========================================================#
+  qbittorrent2:
+    container_name: qbittorrent2
+    image: lscr.io/linuxserver/qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=002
+      - TZ=${TZ}
+      - WEBUI_PORT=8092
+      # - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
+    volumes:
+      - /volume2/docker/qbittorrent2/config:/config
+      - /volume1/Media:/data
+    # depends_on:
+    #   - gluetun
+    network_mode: service:gluetun2 # Use the VPN network
+    # networks:
+    #   - fetchrr_net
+  #===========================================================#
+  prowlarr:
+    container_name: prowlarr
+    image: lscr.io/linuxserver/prowlarr:develop
+    restart: unless-stopped
+    ports:
+      - 9696:9696
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume2/docker/prowlarr/config:/config
+      - /volume1/Media:/data
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    # network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
+  #===========================================================#
+  radarr:
+    container_name: radarr
+    image: ghcr.io/hotio/radarr:latest
+    restart: unless-stopped
+    ports:
+      - 7878:7878
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume2/docker/radarr/config:/config
+      - /volume1/Media:/data
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    # network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
+    logging:
+      driver: json-file
+  #===========================================================#
+  sonarr-anime:
+    container_name: sonarr-anime
+    image: ghcr.io/hotio/sonarr:latest
+    restart: unless-stopped
+    ports:
+      - 8989:8989
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume2/docker/sonarr/config:/config # existing config, kept in place
+      - /volume1/Media:/data
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    # network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
+    logging:
+      driver: json-file
+  #===========================================================#
+  sonarr-tv:
+    container_name: sonarr-tv
+    image: ghcr.io/hotio/sonarr:latest
+    restart: unless-stopped
+    ports:
+      - 8990:8989
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
+      - SONARR_PUBLIC_URL=${SONARR_PUBLIC_URL}
+    volumes:
+      - /volume2/docker/sonarr-tv/config:/config
+      - /volume1/Media:/data
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    # network_mode: service:gluetun # Use the VPN network
+    networks:
+      - fetchrr_net
+    logging:
+      driver: json-file
+  #===========================================================#
+  bazarr:
+    container_name: bazarr
+    image: ghcr.io/hotio/bazarr:latest
+    restart: unless-stopped
+    ports:
+      - 6767:6767/tcp
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume2/docker/bazarr/config:/config
+      - /volume1/Media/media:/data/media
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - fetchrr_net
+  #===========================================================#
+  bazarr-tv:
+    container_name: bazarr-tv
+    image: ghcr.io/hotio/bazarr:latest
+    restart: unless-stopped
+    ports:
+      - 6768:6767/tcp
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume2/docker/bazarr-tv/config:/config
+      - /volume1/Media/media:/data/media
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - fetchrr_net
+  #===========================================================#
+  seerr:
+    container_name: seerr
+    image: ghcr.io/seerr-team/seerr:latest
     init: true
+    restart: unless-stopped
+    ports:
+      - 5055:5055
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=info
+    volumes:
+      - /volume2/docker/seerr/config:/app/config
+    networks:
+      - fetchrr_net
+  #===========================================================#
+  doplarr:
+    container_name: doplarr
+    image: ghcr.io/activexray/doplarr_rs:latest
     restart: unless-stopped
     environment:
       - TZ=${TZ}
-      # Sonarr TV
-      - SONARR_TV_URL=http://sonarr-tv:8989
-      - SONARR_TV_API_KEY=${sonarr_tv_api_key}
-      - SONARR_TV_PUBLIC_URL=${SONARR_PUBLIC_URL}
-      # Sonarr Anime
-      - SONARR_ANIME_URL=http://sonarr-anime:8989
-      - SONARR_ANIME_API_KEY=${sonarr_anime_api_key}
-      - SONARR_ANIME_PUBLIC_URL=${SONARR_ANIME_PUBLIC_URL}
-      # Radarr
-      - RADARR_URL=http://radarr:7878
+      - DISCORD_TOKEN=${bot_token}
       - RADARR_API_KEY=${radarr_api_key}
-      - RADARR_PUBLIC_URL=${RADARR_PUBLIC_URL}
-      # Prowlarr
-      - PROWLARR_URL=http://prowlarr:9696
-      - PROWLARR_API_KEY=${prowlarr_api_key}
-      # qBittorrent — address each by its OWN gluetun container (not "mediagluetun", see README)
-      - QBIT_PUBLIC_URL=http://gluetun:8090
-      - QBIT_PRIVATE_URL=http://gluetun2:8092
-      - QBIT_USER=${qbit_user}
-      - QBIT_PUBLIC_PASSWORD=${qbit_password}
-      - QBIT_PRIVATE_PASSWORD=${qbit2_password}
-      # Bazarr x2, Seerr (optional — leave the stack variables empty if unused)
-      - BAZARR_URL=http://bazarr:6767
-      - BAZARR_API_KEY=${bazarr_api_key}
-      - BAZARR_TV_URL=http://bazarr-tv:6767
-      - BAZARR_TV_API_KEY=${bazarr_tv_api_key}
-      - SEERR_URL=http://seerr:5055
-      - SEERR_API_KEY=${seerr_api_key}
-      # Plex on the NAS itself, default port. 172.19.0.1 = fetchrr_net gateway (= the host);
-      # the LAN IP 192.168.1.187 is NOT reachable from containers on this network.
-      - PLEX_URL=http://172.19.0.1:32400
-      - PLEX_TOKEN=${plex_token}
-      # Discord alerts
-      - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
+      - SONARR_TV_API_KEY=${sonarr_tv_api_key}
+      - SONARR_ANIME_API_KEY=${sonarr_anime_api_key}
     volumes:
-      - /volume2/docker/arr-ops/home:/home/ops          # Claude Code install, login, memory, shell history
-      - /volume2/docker/arr-ops/workspace:/workspace    # scripts, crontab, state, logs, CLAUDE.md
-      - /volume1/Media:/data                            # same view of media/torrents as the apps (hardlinks work)
-      - /etc/localtime:/etc/localtime:ro
+      - /volume2/docker/doplarr/config/config.toml:/config.toml:ro
     depends_on:
+      - radarr
       - sonarr-tv
       - sonarr-anime
-      - radarr
     networks:
       - fetchrr_net
+  #===========================================================#
