@@ -320,6 +320,7 @@ services:
       # Discord alerts
       - CHURN_WEBHOOK_URL=${CHURN_WEBHOOK_URL}
       - ANTHROPIC_API_KEY=${claude_key}
+      - DISCORD_BOT_TOKEN=${discord_bot_token}
     volumes:
       - /volume2/docker/arr-ops/home:/home/ops          # Claude Code install, login, memory
       - /volume2/docker/arr-ops/workspace:/workspace    # scripts, crontab, state, logs, CLAUDE.md
